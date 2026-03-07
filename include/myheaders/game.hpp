@@ -11,26 +11,27 @@ class SceneManager;
 
 class Game{
     public:
-        GLuint g_vao, g_vbo, g_ebo;
-        GLuint texColorBuffer;
-        GLuint fbo;
-        GLuint rbo;
-        Program *shader;
+        //OPENGL
+        GLuint g_vao, g_vbo, g_ebo=0;
+        GLuint texColorBuffer=0;
+        GLuint fbo=0;
+        GLuint rbo=0;
+        Program *shader=nullptr;
 
         glm::mat4 projection;
+
+        //SDL
         SDL_Window* window;
         SDL_GLContext gl_context;
         SDL_Surface* icon;
         SDL_Event e;
 
-        Uint64 freq = 0;
-        Uint64 last = 0;
-        float fps = 0.0f;
-        float delta = 0.0f;
-
-        bool running = true;
+        //STD
         std::string scene = "scene-0";
+        bool running = true;
+        float delta, fps = 0.0f;
 
+        //MY CLASS
         SceneManager* scenes;
 
         Game();

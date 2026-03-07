@@ -44,8 +44,6 @@ Game::Game(){
     glEnable(GL_MULTISAMPLE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);   
     
-    freq = SDL_GetPerformanceFrequency();
-    last = SDL_GetPerformanceCounter();
   
     //RESIZING
     int window_width, window_height;
@@ -137,7 +135,6 @@ void Game::updateGame(){
                 projection = glm::ortho(0.0f, static_cast<float>(new_width), static_cast<float>(new_height), 0.0f, -1.0f, 1.0f);
             }
         }
-    std::cout << fps << "\r";
 }
 
 
@@ -165,34 +162,37 @@ void Game::renderGame(){
 
 
 void Game::runGame(){
+    const float targetFPS = FPS > 0.0f ? FPS : 0.0f;
+    const float targetFrameTime = targetFPS > 0.0f ? 1.0f / targetFPS : 0.0f;
+
+    Uint64 prevCounter = SDL_GetPerformanceCounter();
     while (running){
-        Uint64 frame_start = SDL_GetPerformanceCounter();
+        Uint64 frameStart = SDL_GetPerformanceCounter();
         Uint64 now = SDL_GetPerformanceCounter();
-        delta = (float)(now - last) / (float)freq;
-        last = now;
+        delta = (float)(now - prevCounter) / SDL_GetPerformanceFrequency();
+        prevCounter = now;
 
-        if (delta > 0.1f)
-            delta = 0.1f;
-
-        if (delta > 0.0f) {
-            fps = fps * 0.9f + (1.0f / delta) * 0.1f;
-        }
+        if(delta > 0.1f) delta = 0.1f;
 
         updateGame();
         renderGame();
 
-        if (FPS > 0.0f){
+        if(targetFrameTime > 0.0f){
+            Uint64 frameEnd = SDL_GetPerformanceCounter();
+            float frameTime = (float)(frameEnd - frameStart) / (float)SDL_GetPerformanceFrequency();
 
-            float target = 1.0f / FPS;
-
-            Uint64 frame_end = SDL_GetPerformanceCounter();
-            float frame_time = (float)(frame_end - frame_start) / (float)freq;
-
-            if (frame_time < target){
-                SDL_Delay((Uint32)((target - frame_time) * 1000.0f));
+            if(frameTime < targetFrameTime){
+                float delayMS = (targetFrameTime - frameTime) * 1000.0f;
+                if(delayMS > 1.0f){
+                    SDL_Delay((Uint32)(delayMS - 1));
+                }
+                while((float)(SDL_GetPerformanceCounter() - frameStart) / SDL_GetPerformanceFrequency() < targetFrameTime);
             }
         }
-        
+
+        fps = 1.0f / delta;
+        std::cout << fps << "\r";
+
     }
 
     SDL_DestroyWindow(window);

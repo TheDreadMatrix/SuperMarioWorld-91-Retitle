@@ -1,6 +1,7 @@
 #pragma once
 #include <myheaders/imports.hpp>
 #include <myheaders/scenes/menu.hpp>
+#include <myheaders/scenes/settings.hpp>
 #include <myheaders/scene_component.hpp>
 
 
@@ -25,7 +26,7 @@ class SceneManager{
 
             scene_dict["intro"] = [this](){return new IntroScene(this->game);};
             scene_dict["menu"] = [this](){return new MainMenu(this->game);};
-            scene_dict["settings"] = [this](){return new SceneEmpty(this->game);};
+            scene_dict["settings"] = [this](){return new Settings(this->game);};
             scene_dict["quit"] = [this](){return new SceneEmpty(this->game);};
 
             scene_dict["overworld-1"] = [this](){return new SceneEmpty(this->game);};

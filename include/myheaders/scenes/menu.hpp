@@ -4,9 +4,16 @@
 #include <myheaders/utilis/read.hpp>
 
 
+#include <include_audio/soloud.h>
+#include <include_audio/soloud_wav.h>
+
+
 class IntroScene : public SceneComponent{
     public:
         //ATTRIBUTES
+        SoLoud::Soloud gSoloud;
+        SoLoud::Wav gWave;
+
         GLuint vao, vbo, ebo, texture;
         Program *shader;
 
@@ -15,6 +22,11 @@ class IntroScene : public SceneComponent{
         IntroScene(Game* game) : SceneComponent(game) {}
 
         void onInit() override {
+            gSoloud.init();
+            gWave.load("assets/soundtracks/n.wav");
+
+            gSoloud.play(gWave);
+
             std::vector<float>  vertices = {
                 // positions       // uv_coords
                 0.0f, 1.0f,       0.0f, 1.0f,
@@ -82,6 +94,7 @@ class IntroScene : public SceneComponent{
         }
 
         void onDestroy() override {
+            gSoloud.deinit();
             delete shader;  
             glDeleteVertexArrays(1, &vao);
             glDeleteBuffers(1, &vbo);
