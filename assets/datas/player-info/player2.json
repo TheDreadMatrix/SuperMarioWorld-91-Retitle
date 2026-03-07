@@ -1,0 +1,14 @@
+{
+    "player": {
+        "form": 1,
+        "coins": 0,
+        "rcoins": 0,
+        "lives": 5
+    },
+    "action": {
+        "was-started": false,
+        "current-level": "start",
+        "current-checkpoint": null,
+        "current-overworld": 1
+    }
+}

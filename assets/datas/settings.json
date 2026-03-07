@@ -1,0 +1,8 @@
+{
+    "locale-language": "eng",
+    "music-volume": 1.0,
+    "sound-volume": 1.0,
+    "vsync": 0,
+    "debug": true,
+    "shader": "none"
+}
