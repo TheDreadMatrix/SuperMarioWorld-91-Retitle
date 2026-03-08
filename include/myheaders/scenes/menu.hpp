@@ -1,18 +1,18 @@
 #pragma once
+#include <myheaders/imports.hpp>
 #include <myheaders/opengl/all.hpp>
 #include <myheaders/scene_component.hpp>
 #include <myheaders/utilis/read.hpp>
 
 
-#include <include_audio/soloud.h>
-#include <include_audio/soloud_wav.h>
 
 
 class IntroScene : public SceneComponent{
     public:
         //ATTRIBUTES
-        SoLoud::Soloud gSoloud;
         SoLoud::Wav gWave;
+        SoLoud::BiquadResonantFilter lowpass;
+        int h;
 
         GLuint vao, vbo, ebo, texture;
         Program *shader;
@@ -22,10 +22,13 @@ class IntroScene : public SceneComponent{
         IntroScene(Game* game) : SceneComponent(game) {}
 
         void onInit() override {
-            gSoloud.init();
             gWave.load("assets/soundtracks/n.wav");
 
-            gSoloud.play(gWave);
+            lowpass.setParams(SoLoud::BiquadResonantFilter::LOWPASS, 1000, 2);
+            gWave.setFilter(0, &lowpass);
+            gWave.setLooping(true);
+
+            h = game->AEngine->play(gWave);
 
             std::vector<float>  vertices = {
                 // positions       // uv_coords
@@ -74,6 +77,11 @@ class IntroScene : public SceneComponent{
             if (e.type == SDL_EVENT_KEY_DOWN){
                 if (e.key.scancode == SDL_SCANCODE_W)
                     game->switchScene("menu");
+
+                if (e.key.scancode == SDL_SCANCODE_I)
+                    game->AEngine->setRelativePlaySpeed(h, 1.0);
+                else if (e.key.scancode == SDL_SCANCODE_K)
+                    game->AEngine->setRelativePlaySpeed(h, 1.3);
             }
         }
 
@@ -94,7 +102,6 @@ class IntroScene : public SceneComponent{
         }
 
         void onDestroy() override {
-            gSoloud.deinit();
             delete shader;  
             glDeleteVertexArrays(1, &vao);
             glDeleteBuffers(1, &vbo);

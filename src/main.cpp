@@ -6,6 +6,7 @@
 #endif
 
 //OWN HEADERS
+#define WITH_MINIAUDIO
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <myheaders/scene_manager.hpp>
@@ -18,6 +19,8 @@
 
 Game::Game(){
     SDL_Init(SDL_INIT_VIDEO);
+    AEngine = new SoLoud::Soloud;
+    AEngine->init();
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -198,6 +201,8 @@ void Game::runGame(){
     SDL_DestroyWindow(window);
     SDL_GL_DestroyContext(gl_context);
     SDL_Quit();
+    AEngine->deinit();
+    delete AEngine;
     delete scenes;
 }
 

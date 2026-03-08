@@ -11,6 +11,9 @@ class SceneManager;
 
 class Game{
     public:
+        //AUDIO
+        SoLoud::Soloud *AEngine;
+
         //OPENGL
         GLuint g_vao, g_vbo, g_ebo=0;
         GLuint texColorBuffer=0;

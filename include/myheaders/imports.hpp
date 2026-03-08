@@ -8,6 +8,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <soloud.h>
+#include <soloud_wav.h>
+#include <soloud_biquadresonantfilter.h>
+
 #define CLEAR_WINDOW GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT
 #define TRUE 1
 #define FALSE 0
