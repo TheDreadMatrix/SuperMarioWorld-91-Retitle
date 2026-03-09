@@ -92,7 +92,34 @@ int main() {
 
 
 
+scenes_declarataion.hpp
 
+#SCENE MENU
+#include <scene_declaration.hpp>
+
+class Menu
+
+
+
+
+
+float scale = std::min(windowWidth / spriteWidth, windowHeight / spriteHeight);
+newWidth  = spriteWidth  * scale;
+newHeight = spriteHeight * scale;
+
+// Центрируем:
+offsetX = (windowWidth  - newWidth) / 2;
+offsetY = (windowHeight - newHeight) / 2;
+
+
+
+float scale = std::max(windowWidth / spriteWidth, windowHeight / spriteHeight);
+newWidth  = spriteWidth  * scale;
+newHeight = spriteHeight * scale;
+
+// Центрируем:
+offsetX = (windowWidth  - newWidth) / 2;
+offsetY = (windowHeight - newHeight) / 2;
 
 
 

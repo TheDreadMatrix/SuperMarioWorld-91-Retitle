@@ -1,12 +1,9 @@
-#if defined(_WIN32)
-    #define SUCCESS
-#else
-    #error "That Game Support only Windows system!"
-#endif
-
 //OWN HEADERS
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_TRUETYPE_IMPLEMENTATION
+
+
+#include <glm/gtc/matrix_transform.hpp>
 #include <myheaders/scene_manager.hpp>
 #include <myheaders/game.hpp>
 
@@ -25,7 +22,7 @@ Game::Game(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1); 
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-    window = SDL_CreateWindow("Super Mario World: 91 Retitle", 800, 600, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("Super Mario World: 91 Retitle", 800, 600, SDL_WINDOW_OPENGL|SDL_WINDOW_BORDERLESS);
 
     int width, height, channels;
     unsigned char* data = stbi_load("assets/icon.png", &width, &height, &channels, 4);
@@ -53,61 +50,49 @@ Game::Game(){
     projection = glm::ortho(0.0f, static_cast<float>(window_width), static_cast<float>(window_height), 0.0f, 1.0f, -1.0f);
     glViewport(0, 0, window_width, window_height);
 
-    //FBO TEXTURE
+
+    //FBO RBO TEXTURE
     /*
-    glGenTextures(1, &texColorBuffer);
-    glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window_width, window_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr); 
+    genFbo(fbo);
+    genRbo(rbo);
+    texColorBuffer = giveTextureFrame(window_width, window_height);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    bindFbo(fbo);
+    bindRbo(rbo, window_width, window_height);
+    attachTexFbo(texColorBuffer);
 
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    bindFbo(0);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window_width, window_height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
-
-
-    //SCENES
-    scenes = new SceneManager(this);
-
-    /*
-    std::vector<float> quadVertices = {
+    //PROGRAM VAO EBO VBO
+    std::vector<float> vertices = {
         // x, y,   u, v
-        -1.0f,  1.0f,  0.0f, 1.0f,  
-        -1.0f, -1.0f,  0.0f, 0.0f,  
+        -1.0f, -1.0f,  0.0f, 0.0f, 
         1.0f, -1.0f,  1.0f, 0.0f, 
-        1.0f,  1.0f,  1.0f, 1.0f   
+        1.0f,  1.0f,  1.0f, 1.0f,
+        -1.0f,  1.0f,  0.0f, 1.0f 
     };
 
-    std::vector<unsigned int> quadIndices = {
-        0, 1, 2,  
-        0, 2, 3   
+    std::vector<unsigned int> indices = {
+        0, 1, 2,
+        2, 3, 0
     };
-
-
     shader = new Program(readFile("assets/shaders/core/core.vert"), readFile("assets/shaders/core/core.frag"));
     genVao(g_vao);
     genBuffer(g_vbo);
     genBuffer(g_ebo);
 
     bindVao(g_vao);
-    bindVbo(g_vbo, quadVertices);
-    bindEbo(g_ebo, quadIndices);
+    bindBuffer(GL_ARRAY_BUFFER, g_vbo, vertices);
+    bindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ebo, indices);
 
-    setShaderAttribute(0, 2, 4, 0);
-    setShaderAttribute(1, 2, 4, 2);
+    setShader(0, 2, 4, 0);
+    setShader(1, 2, 4, 2);
+
     bindVao(0);*/
 
+
+    //SCENES
+    scenes = new SceneManager(this);
 
 }
 
@@ -124,9 +109,15 @@ void Game::switchScene(std::string scene_name, bool reload){
 
 void Game::updateGame(){
     scenes->updateScene();
+    time += delta;
     while (SDL_PollEvent(&e)) {
             if (e.type == SDL_EVENT_QUIT) running = false;
                 scenes->eventScene(e);
+
+            if (e.type == SDL_EVENT_KEY_DOWN){
+                if (e.key.repeat == 0 && e.key.scancode == SDL_SCANCODE_ESCAPE)
+                    running = false;
+            }
 
             if (e.type == SDL_EVENT_WINDOW_RESIZED){
                 int new_width, new_height;
@@ -141,22 +132,21 @@ void Game::updateGame(){
 
 
 void Game::renderGame(){
-    //glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    //glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //bindFbo(fbo);
 
     scenes->renderScene();
 
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //bindFbo(0);
     //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    //activateTexture(texColorBuffer, 1);
+    //activateTexture(texColorBuffer);
+
     //shader->useProgram();
-    //shader->setInt("tex", 1);
-    //shader->setFloat("time", SDL_GetTicks()/1000.0f);
+    //shader->setInt("tex", 0);
+    //shader->setFloat("time", time);
 
-    //Render(g_vao, 6);
+    //render(g_vao, 6);
 
     SDL_GL_SwapWindow(window);
 }

@@ -1,7 +1,9 @@
 #pragma once
 
-
-#include <myheaders/imports.hpp>
+#include <myheaders/stdport/stdport.hpp>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 typedef std::string str;
 
@@ -45,15 +47,50 @@ void genBuffer(GLuint& buffer);
 
 void bindVao(GLuint vao);
 void bindFbo(GLuint fbo);
-void bindRbo(GLuint rbo);
-void bindVbo(GLuint vbo, std::vector<float>& vertices);
-void bindEbo(GLuint ebo, std::vector<unsigned int>& indices);
+void bindRbo(GLuint rbo, int width, int height);
+
+template<typename T>
+void bindBuffer(GLenum type, GLuint buffer, const std::vector<T>& data);
 
 void setShader(int index, int size, int stride, int offset, bool divisor=false);
 void render(GLuint vao, int index_count, GLenum mode=GL_TRIANGLES);
 void renderDivisor(GLuint vao, int index_count, int instance_count, GLenum mode=GL_TRIANGLES);
 
 
+void attachTexFbo(GLuint texture);
 void activateTexture(GLuint texture, int slot=0);
 void activateTextureArray(GLuint texture_array, int slot=0);
 void activateTextureCubeMap(GLuint texture_cubemap, int slot=0);
+
+//-----------------------------------------------
+//CREATING VAO, VBO, EBO
+//
+//
+//GLuint VAO, VBO, EBO
+//genVao(VAO);
+//genBuffer(VBO);
+//genBuffer(EBO);
+//
+//bindVao(VAO);
+//bindVbo(VBO, {...})
+//bindEbo(EBO, {...})
+//
+//setShader(0, 3, 3, 0);
+//bindVao(0);
+//
+//CREATING FBO, RBO, TEXTURE
+//
+//
+//GLuint FBO, RBO, texture;
+//genFbo(FBO);
+//genRbo(RBO);
+//
+//bindFbo(FBO);
+//attachTexFbo(texture);
+//
+//bindRbo(RBO, 800, 600);
+//bindFbo(0);
+//
+//
+//
+//

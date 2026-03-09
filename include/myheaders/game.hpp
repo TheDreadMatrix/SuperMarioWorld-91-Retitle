@@ -1,5 +1,7 @@
 #pragma once
-#include <myheaders/imports.hpp>
+#include <myheaders/stdport/stdport.hpp>
+#include <SDL3/SDL.h>
+#include <soloud.h>
 #include <moderngl/program_mesh.hpp>
 
 #ifndef FPS
@@ -15,10 +17,10 @@ class Game{
         SoLoud::Soloud *AEngine;
 
         //OPENGL
-        GLuint g_vao, g_vbo, g_ebo=0;
-        GLuint texColorBuffer=0;
-        GLuint fbo=0;
-        GLuint rbo=0;
+        GLuint g_vao, g_vbo, g_ebo;
+        GLuint texColorBuffer;
+        GLuint fbo;
+        GLuint rbo;
         Program *shader=nullptr;
 
         glm::mat4 projection;
@@ -33,6 +35,7 @@ class Game{
         std::string scene = "scene-0";
         bool running = true;
         float delta, fps = 0.0f;
+        float time = 0.0f;
 
         //MY CLASS
         SceneManager* scenes;

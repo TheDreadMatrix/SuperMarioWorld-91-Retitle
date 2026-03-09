@@ -1,5 +1,7 @@
 #pragma once
-#include <myheaders/imports.hpp>
+
+#include <myheaders/stdport/stdport.hpp>
+#include <SDL3/SDL.h>
 #include <myheaders/game.hpp>
 
 
@@ -35,7 +37,7 @@ class SceneEmpty : public SceneComponent{
                     game->switchScene("menu");
             }
         }
-        void onRender() override {glClearColor(0.0f, 0.0f, 1.0f, 1.0f); glClear(CLEAR_WINDOW);}
+        void onRender() override {glClearColor(0.0f, 0.0f, 1.0f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);}
         void onDestroy() override {std::cout << "EMPTY DESTROYED" << std::endl;}
         friend std::ostream& operator<<(std::ostream& os, const SceneEmpty& scene){
             os << "Scene Empty class";

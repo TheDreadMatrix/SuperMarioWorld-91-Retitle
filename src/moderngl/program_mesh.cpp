@@ -155,23 +155,42 @@ void genBuffer(GLuint& buffer){
     glGenBuffers(1, &buffer);
 }
 
+void genFbo(GLuint& fbo){
+    glGenFramebuffers(1, &fbo);
+}
+
+void genRbo(GLuint& rbo){
+    glGenRenderbuffers(1, &rbo);
+}
 
 
 
+
+void bindFbo(GLuint fbo){
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+}
 
 void bindVao(GLuint vao){
     glBindVertexArray(vao);
 }  
 
-void bindVbo(GLuint vbo, std::vector<float>& vertices){
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+void bindRbo(GLuint rbo, int width, int height){
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 }
 
-void bindEbo(GLuint ebo, std::vector<unsigned int>& indices){
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+template<typename T>
+void bindBuffer(GLenum type, GLuint buffer, const std::vector<T>& data){
+    glBindBuffer(type, buffer);
+    glBufferData(type, data.size() * sizeof(T), data.data(), GL_STATIC_DRAW);
 }
+
+template void bindBuffer<float>(GLenum, GLuint, const std::vector<float>&);
+template void bindBuffer<unsigned int>(GLenum, GLuint, const std::vector<unsigned int>&);
+template void bindBuffer<glm::vec2>(GLenum, GLuint, const std::vector<glm::vec2>&);
+template void bindBuffer<glm::vec3>(GLenum, GLuint, const std::vector<glm::vec3>&);
 
 
 
@@ -194,6 +213,10 @@ void renderDivisor(GLuint vao, int index_count, int instance_count, GLenum mode)
 }
 
 
+
+void attachTexFbo(GLuint texture){
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+}
 
 void activateTexture(GLuint texture, int slot){
     glActiveTexture(GL_TEXTURE0 + slot);

@@ -1,11 +1,14 @@
 #pragma once
-#include <myheaders/imports.hpp>
-#include <myheaders/opengl/textures.hpp>
+
+
+#include <soloud_wav.h>
+#include <soloud_biquadresonantfilter.h>
 #include <myheaders/scene_component.hpp>
 #include <myheaders/utilis/read.hpp>
 
 
 #include <moderngl/program_mesh.hpp>
+#include <moderngl/textures.hpp>
 
 
 
@@ -16,7 +19,7 @@ class IntroScene : public SceneComponent{
         SoLoud::BiquadResonantFilter lowpass;
         int h;
 
-        GLuint vao, vbo, ebo, texture;
+        GLuint vao, vbo, ebo, ivbo,  texture;
         Program *shader;
 
         glm::vec2 position = glm::vec2(0, 0);
@@ -26,7 +29,7 @@ class IntroScene : public SceneComponent{
         void onInit() override {
             gWave.load("assets/soundtracks/n.wav");
 
-            lowpass.setParams(SoLoud::BiquadResonantFilter::LOWPASS, 1000, 2);
+            lowpass.setParams(SoLoud::BiquadResonantFilter::LOWPASS, 1500, 2);
             gWave.setFilter(0, &lowpass);
             gWave.setLooping(true);
 
@@ -45,19 +48,35 @@ class IntroScene : public SceneComponent{
                 0, 1, 2, 2, 3, 0
             };
 
+            std::vector<glm::vec2> instanceOffsets;
+
+            int amount = 100;
+
+            for (int i = 0; i < amount; i++) {
+                float x = (i % 10) * 100.0f;
+                float y = (i / 10) * 100.0f;
+
+                instanceOffsets.push_back(glm::vec2(x, y));
+            }
+
             shader = new Program(readFile("assets/shaders/shader.vert"), readFile("assets/shaders/shader.frag"));
-            texture = giveTexture("assets/icon.png", NEAREST, BRUE, BRUE, BALSE, BALSE, 0.0f);
+            texture = giveTexture("assets/icon.png", NEAREST, true, true, false, false, 0.0f);
 
             genVao(vao);
             genBuffer(vbo);
             genBuffer(ebo);
+            genBuffer(ivbo);
 
             bindVao(vao);
-            bindVbo(vbo, vertices);
-            bindEbo(ebo, indices);
+            bindBuffer(GL_ARRAY_BUFFER, vbo, vertices);
+            bindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo, indices);
 
             setShader(0, 2, 4, 0);
             setShader(1, 2, 4, 2);
+
+            bindBuffer(GL_ARRAY_BUFFER, ivbo, instanceOffsets);
+            setShader(2, 2, 2, 0, true);
+
             bindVao(0);
 
             
@@ -80,16 +99,19 @@ class IntroScene : public SceneComponent{
                 if (e.key.scancode == SDL_SCANCODE_W)
                     game->switchScene("menu");
 
-                if (e.key.scancode == SDL_SCANCODE_I)
-                    game->AEngine->setRelativePlaySpeed(h, 1.0);
-                else if (e.key.scancode == SDL_SCANCODE_K)
+                if (e.key.scancode == SDL_SCANCODE_I){
+                    game->AEngine->setRelativePlaySpeed(h, 0.7);
+                    game->AEngine->setVolume(h, 0.4);
+                }else if (e.key.scancode == SDL_SCANCODE_K){
                     game->AEngine->setRelativePlaySpeed(h, 1.3);
+                    game->AEngine->setVolume(h, 1.3);
+                }
             }
         }
 
         void onRender() override {
             glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
-            glClear(CLEAR_WINDOW);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             activateTexture(texture);
 
@@ -97,9 +119,10 @@ class IntroScene : public SceneComponent{
             shader->setVector3("rgb", glm::vec3(1.0f, 1.0f, 1.0f));
             shader->setMatrix4("projection", game->projection);
             shader->setVector2("position", glm::round(position));
+            shader->setVector2("scale", glm::vec2(100, 100));
             shader->setInt("tex", 0);
 
-            render(vao, 6);
+            renderDivisor(vao, 6, 100);
 
         }
 
@@ -108,6 +131,7 @@ class IntroScene : public SceneComponent{
             glDeleteVertexArrays(1, &vao);
             glDeleteBuffers(1, &vbo);
             glDeleteBuffers(1, &ebo);
+            glDeleteBuffers(1, &ivbo);
             glDeleteTextures(1, &texture);  
         }
 };
@@ -140,7 +164,7 @@ class MainMenu : public SceneComponent{
 
         void onRender() override{
             glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
-            glClear(CLEAR_WINDOW);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
         void onDestroy() override{
