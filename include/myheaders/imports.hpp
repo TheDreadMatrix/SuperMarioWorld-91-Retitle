@@ -36,8 +36,3 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
-
-#define HELLO_SEGFAULT std::cout << "SEFAULT" << std::endl;
-#define BYE_SEGFAULT std::cout << "BYE SEGFAULT" << std::endl;
-#define CHECKPOINT std::cout << "SET FLAG" << std::endl;
-

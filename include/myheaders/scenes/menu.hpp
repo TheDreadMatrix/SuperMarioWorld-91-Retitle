@@ -1,9 +1,11 @@
 #pragma once
 #include <myheaders/imports.hpp>
-#include <myheaders/opengl/all.hpp>
+#include <myheaders/opengl/textures.hpp>
 #include <myheaders/scene_component.hpp>
 #include <myheaders/utilis/read.hpp>
 
+
+#include <moderngl/program_mesh.hpp>
 
 
 
@@ -54,8 +56,8 @@ class IntroScene : public SceneComponent{
             bindVbo(vbo, vertices);
             bindEbo(ebo, indices);
 
-            setShaderAttribute(0, 2, 4, 0);
-            setShaderAttribute(1, 2, 4, 2);
+            setShader(0, 2, 4, 0);
+            setShader(1, 2, 4, 2);
             bindVao(0);
 
             
@@ -97,7 +99,7 @@ class IntroScene : public SceneComponent{
             shader->setVector2("position", glm::round(position));
             shader->setInt("tex", 0);
 
-            Render(vao, 6);
+            render(vao, 6);
 
         }
 

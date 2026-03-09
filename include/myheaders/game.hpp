@@ -1,9 +1,9 @@
 #pragma once
 #include <myheaders/imports.hpp>
-#include <myheaders/opengl/program.hpp>
+#include <moderngl/program_mesh.hpp>
 
 #ifndef FPS
-    #define FPS 1000
+    #define FPS 1000.0f
 #endif
 
 class SceneManager;

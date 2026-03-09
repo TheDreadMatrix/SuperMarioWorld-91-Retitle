@@ -279,22 +279,3 @@ GLuint giveTextureFrameBuffer(int width, int height){
 
     return texture;
 }
-
-
-
-
-
-void activateTexture(GLuint texture, int slot = 0){
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, texture);
-}
-
-void activateTextureArray(GLuint texture_array, int slot = 0){
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, texture_array);
-}
-
-void activateTextureCube(GLuint texture_cube, int slot = 0){
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, texture_cube);
-}

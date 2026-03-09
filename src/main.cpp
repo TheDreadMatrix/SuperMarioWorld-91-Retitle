@@ -1,12 +1,10 @@
 #if defined(_WIN32)
-    #include <windows.h>
-    #include <mmsystem.h>
+    #define SUCCESS
 #else
     #error "That Game Support only Windows system!"
 #endif
 
 //OWN HEADERS
-#define WITH_MINIAUDIO
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <myheaders/scene_manager.hpp>
@@ -38,6 +36,7 @@ Game::Game(){
 
     gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
+    SDL_HideCursor();
     
 
     gladLoadGL();
@@ -125,7 +124,6 @@ void Game::switchScene(std::string scene_name, bool reload){
 
 void Game::updateGame(){
     scenes->updateScene();
-
     while (SDL_PollEvent(&e)) {
             if (e.type == SDL_EVENT_QUIT) running = false;
                 scenes->eventScene(e);
@@ -138,6 +136,7 @@ void Game::updateGame(){
                 projection = glm::ortho(0.0f, static_cast<float>(new_width), static_cast<float>(new_height), 0.0f, -1.0f, 1.0f);
             }
         }
+    
 }
 
 
@@ -194,7 +193,6 @@ void Game::runGame(){
         }
 
         fps = 1.0f / delta;
-        std::cout << fps << "\r";
 
     }
 
@@ -210,13 +208,11 @@ void Game::runGame(){
 
 int main(){
     std::cout << "OK RUN" << std::endl;
-    timeBeginPeriod(1);
 
     Game game;
 
     game.runGame();
 
-    timeEndPeriod(1);
 
     std::cout << "OK QUIT" << std::endl;
 
