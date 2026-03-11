@@ -1,0 +1,29 @@
+{
+    "overworld-1": {
+        "start": {"state": "tutorial", "unlocked": true, "title":"Super Valley 0"},
+        "level-1": {"state": "level-1", "unlocked": true, "title": "Super Valley 1"},
+        "level-2": {"state": "level-2", "unlocked": false, "title":"Super Valley 2"},
+        "level-3": {"state": "level-3", "unlocked": false, "title":"Super Valley 3"},
+        "level-4": {"state": "level-4", "unlocked": false, "title": "Jerald`s castle: #1"},
+        "end": {"state": "overworld-2", "unlocked": false, "title": "Super Valley`s STAR"}
+    },
+    "overworld-2": {
+        "start": {"state": "overworld-1", "unlocked": true, "title": "Sea of Meldenbrown 0"},
+        "level-1": {"state": "level-1b", "unlocked": true, "title": "Sea of Meldenbrown 1"},
+        "level-2": {"state": "level-2b", "unlocked": false, "title": "Sea of Meldenbrown 2"},
+        "level-3": {"state": "level-3b", "unlocked": false, "title": "Sea of Meldenbrown 3"},
+        "level-4": {"state": "level-4b", "unlocked": false, "title": "Sea of Meldenbrown 4"},
+        "level-5": {"state": "level-5b", "unlocked": false, "title": "LowKey`s castle: #2"},
+        "end": {"state": "overworld-3", "unlocked": false, "title":" Sea of Meldenbrown`s STAR"}
+    },
+    "overworld-3": {
+        "start": {"state": "overworld-2", "unlocked": true, "title": "Volopas`s forest 0"},
+        "level-1": {"state": "level-1c", "unlocked": true, "title": "Volopas`s forest 1"},
+        "level-2": {"state": "level-2c", "unlocked": false, "title": "Volopas`s forest 2"},
+        "level-3": {"state": "level-3c", "unlocked": false, "title": "Volopas`s forest 3"},
+        "level-4": {"state": "level-4c", "unlocked": false, "title": "Volopas`s forest 4"},
+        "level-5": {"state": "level-5c", "unlocked": false, "title": "Volopas`s forest 5"},
+        "level-6": {"state": "level-6c", "unlocked": false, "title": "Lex the Ultraman`s castle: #3"},
+        "end": {"state": "ending", "unlocked": false, "title": "..."}
+    }
+}

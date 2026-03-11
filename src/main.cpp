@@ -34,6 +34,8 @@ Game::Game(){
     gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
     SDL_HideCursor();
+    SDL_SetWindowMouseGrab(window, true);
+    SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     
 
     gladLoadGL();

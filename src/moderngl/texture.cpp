@@ -117,7 +117,7 @@ GLuint giveTextureFrame(int width, int height, int filter){
 
 
 
-GLuint giveTexture(std::string image_path, int filter, bool repeat_x, bool repeat_y, bool flip_x, bool flip_y, float angle){
+GLuint giveTexture(const std::string& image_path, int filter, bool repeat_x, bool repeat_y, bool flip_x, bool flip_y, float angle){
     ImageData img = loadImage(image_path);
     if (flip_x) flipX(img.data, img.width, img.height, 4);
     if (flip_y) flipY(img.data, img.width, img.height, 4);
@@ -207,38 +207,74 @@ GLuint giveTextureArray(list_str images_path, list_bool flips_x, list_bool flips
 
 
 
-GLuint giveTextureText(std::string font_path, std::string text, float pixel_size, int filter, bool repeat_x, bool repeat_y){
+GLuint giveTextureText(const std::string& font_path, const std::string& text, float pixel_size, int filter, bool repeat_x, bool repeat_y){
     std::ifstream file(font_path, std::ios::binary);
-    if (!file) throw std::runtime_error("Can not load font path");
-
-    std::vector<unsigned char> ttf_buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    if (!file) throw std::runtime_error("Cannot load font file");
+    std::vector<unsigned char> ttf_buffer((std::istreambuf_iterator<char>(file)),
+                                           std::istreambuf_iterator<char>());
     file.close();
 
     stbtt_fontinfo font;
-    int width, height, xoff, yoff;
-    if (stbtt_InitFont(&font, ttf_buffer.data(), 0))
+    if (!stbtt_InitFont(&font, ttf_buffer.data(), 0))
         throw std::runtime_error("Failed to init font");
 
     float scale = stbtt_ScaleForPixelHeight(&font, pixel_size);
-    
 
+    int width = 0;
+    int height = 0;
+    int ascent, descent, lineGap;
+    stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
+    ascent = int(ascent * scale);
+    descent = int(descent * scale);
 
+    for (char c : text) {
+        int ax, lsb, cx, cy, xoff, yoff;
+        stbtt_GetCodepointHMetrics(&font, c, &ax, &lsb);
+        stbtt_GetCodepointBitmapBox(&font, c, scale, scale, &xoff, &yoff, &cx, &cy);
+        width += ax * scale;
+        height = std::max(height, cy - yoff);
+    }
+    height += ascent - descent;
+
+    std::vector<unsigned char> bitmap(width * height, 0);
+
+    int x = 0;
+    for (char c : text) {
+        int ax, lsb, cx, cy, xoff, yoff;
+        stbtt_GetCodepointHMetrics(&font, c, &ax, &lsb);
+        stbtt_GetCodepointBitmapBox(&font, c, scale, scale, &xoff, &yoff, &cx, &cy);
+
+        std::vector<unsigned char> glyph(cx * cy);
+        stbtt_MakeCodepointBitmap(&font, glyph.data(), cx, cy, cx, scale, scale, c);
+
+        for (int gy = 0; gy < cy; gy++) {
+            for (int gx = 0; gx < cx; gx++) {
+                int dst_x = x + gx + xoff;
+                int dst_y = ascent - yoff - cy + gy;
+                if (dst_x >= 0 && dst_x < width && dst_y >= 0 && dst_y < height) {
+                    bitmap[dst_y * width + dst_x] = glyph[gy * cx + gx];
+                }
+            }
+        }
+        x += ax * scale;
+    }
 
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, );
 
     TextureFilter texfilter = defineFilter(filter);
 
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, texfilter.min_f);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, texfilter.mag_f);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texfilter.min_f);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texfilter.mag_f);
 
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, repeat_x ? GL_REPEAT : GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, repeat_y ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeat_x ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeat_y ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, bitmap.data());
 
     if (texfilter.use_mipmap) {
-        glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+        glGenerateMipmap(GL_TEXTURE_2D);
     }
 
     glBindTexture(GL_TEXTURE_2D, 0);

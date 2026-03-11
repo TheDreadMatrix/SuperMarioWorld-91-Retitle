@@ -19,14 +19,28 @@ class IntroScene : public SceneComponent{
         SoLoud::BiquadResonantFilter lowpass;
         int h;
 
-        GLuint vao, vbo, ebo, ivbo,  texture;
+        GLuint vao, vbo, ebo, ivbo, texture, text;
         Program *shader;
+        Program *test_shader;
+
+        Johnson *data;
+        json data_read;
 
         glm::vec2 position = glm::vec2(0, 0);
+        int current_slot = 2;
+        float anim_timer = 0.0f;
 
         IntroScene(Game* game) : SceneComponent(game) {}
 
         void onInit() override {
+            data = new Johnson(getDataPath("test.json"));
+            data_read = data->readData();
+
+            std::cout << data_read << std::endl;
+            data_read["count"] = 1;
+            data_read["hello"] = "hello world!";
+            data->saveData(data_read);
+
             gWave.load("assets/soundtracks/n.wav");
 
             lowpass.setParams(SoLoud::BiquadResonantFilter::LOWPASS, 1500, 2);
@@ -59,8 +73,13 @@ class IntroScene : public SceneComponent{
                 instanceOffsets.push_back(glm::vec2(x, y));
             }
 
-            shader = new Program(readFile("assets/shaders/shader.vert"), readFile("assets/shaders/shader.frag"));
-            texture = giveTexture("assets/icon.png", NEAREST, true, true, false, false, 0.0f);
+            shader = new Program(readFile(getShaderPath("shader.vert")), readFile(getShaderPath("shader.frag")));
+            test_shader = new Program(readFile("assets/shaders/just/just.vert"), readFile("assets/shaders/just/just.frag"));
+
+            //text = giveTextureText("assets/fonts/pixel.ttf", "Hello World!");
+            texture = giveTextureArray({getAssetPath("3.png"), getAssetPath("1.png"), getAssetPath("3.png"), getAssetPath("2.png")}, 
+                                {false, false, true, false}, 
+                                {false, false, false, false}, {0.0f, 0.0f, 0.0f, 0.0f});
 
             genVao(vao);
             genBuffer(vbo);
@@ -92,18 +111,27 @@ class IntroScene : public SceneComponent{
 
             if (keystate[SDL_SCANCODE_S])
                 position.y += 200.0f * game->delta;
+            else if (keystate[SDL_SCANCODE_W])
+                position.y -= 200.0f * game->delta;
+
+            anim_timer += game->delta;
+
+            if (anim_timer >= 0.12f) {
+                anim_timer = 0.0f;
+                current_slot++;
+
+                if (current_slot >= 4)
+                    current_slot = 0;
+            }
         }
 
         void onEvent(SDL_Event e) override {
             if (e.type == SDL_EVENT_KEY_DOWN){
-                if (e.key.scancode == SDL_SCANCODE_W)
-                    game->switchScene("menu");
-
                 if (e.key.scancode == SDL_SCANCODE_I){
-                    game->AEngine->setRelativePlaySpeed(h, 0.7);
+                    game->AEngine->setRelativePlaySpeed(h, 1.8f);
                     game->AEngine->setVolume(h, 0.4);
                 }else if (e.key.scancode == SDL_SCANCODE_K){
-                    game->AEngine->setRelativePlaySpeed(h, 1.3);
+                    game->AEngine->setRelativePlaySpeed(h, 1.3f);
                     game->AEngine->setVolume(h, 1.3);
                 }
             }
@@ -113,9 +141,10 @@ class IntroScene : public SceneComponent{
             glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            activateTexture(texture);
+            activateTextureArray(texture);
 
             shader->useProgram();
+            shader->setInt("slot", current_slot);
             shader->setVector3("rgb", glm::vec3(1.0f, 1.0f, 1.0f));
             shader->setMatrix4("projection", game->projection);
             shader->setVector2("position", glm::round(position));
@@ -127,12 +156,15 @@ class IntroScene : public SceneComponent{
         }
 
         void onDestroy() override {
+            delete data;
             delete shader;  
+            delete test_shader;
             glDeleteVertexArrays(1, &vao);
             glDeleteBuffers(1, &vbo);
             glDeleteBuffers(1, &ebo);
             glDeleteBuffers(1, &ivbo);
             glDeleteTextures(1, &texture);  
+            glDeleteTextures(1, &text);
         }
 };
 
