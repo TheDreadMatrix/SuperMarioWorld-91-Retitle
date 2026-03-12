@@ -1,3 +1,8 @@
+#TEST FILES
+
+cd C:\Users\User\.vscode\MyGameC++\apython
+venv/Scripts/activate
+
 
 RUN GAME
 ./main.exe

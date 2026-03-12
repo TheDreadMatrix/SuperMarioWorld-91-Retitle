@@ -14,6 +14,7 @@ class SceneManager{
     public:
         Game* game;
 
+        std::unordered_map<std::string, std::unordered_map<std::string, std::string>> init_dict;
         std::unordered_map<std::string, std::function<SceneComponent*()>> scene_dict;
         std::string manager_state = "";
 
@@ -22,20 +23,40 @@ class SceneManager{
         SceneManager(Game* game) : game(game){
             //registration
             game->scene = "intro";
+
+            init_dict["intro"] = {{"hello", "hello world"}};
             
 
+            registerScene<IntroScene>("intro");
+            registerScene<MainMenu>("menu");
+            registerScene<SceneEmpty>("settings");
+            registerScene<SceneEmpty>("quit");
 
-            scene_dict["intro"] = [this](){return new IntroScene(this->game);};
-            scene_dict["menu"] = [this](){return new MainMenu(this->game);};
-            scene_dict["settings"] = [this](){return new SceneEmpty(this->game);};
-            scene_dict["quit"] = [this](){return new SceneEmpty(this->game);};
+            registerScene<SceneEmpty>("first");
+            registerScene<SceneEmpty>("tutorial");
+            registerScene<SceneEmpty>("ending");
 
-            scene_dict["overworld-1"] = [this](){return new SceneEmpty(this->game);};
-            scene_dict["level-1"] = [this](){return new SceneEmpty(this->game);};
-            scene_dict["level-2"] = [this](){return new SceneEmpty(this->game);};
-            scene_dict["level-3"] = [this](){return new SceneEmpty(this->game);};
-            scene_dict["level-4"] = [this](){return new SceneEmpty(this->game);};
-            scene_dict["level-b0"] = [this](){return new SceneEmpty(this->game);};
+            registerScene<SceneEmpty>("overworld-1");
+            registerScene<SceneEmpty>("overworld-2");
+            registerScene<SceneEmpty>("overworld-3");
+
+            registerScene<SceneEmpty>("level-1");
+            registerScene<SceneEmpty>("level-2");
+            registerScene<SceneEmpty>("level-3");
+            registerScene<SceneEmpty>("level-4");
+
+            registerScene<SceneEmpty>("level-1b");
+            registerScene<SceneEmpty>("level-2b");
+            registerScene<SceneEmpty>("level-3b");
+            registerScene<SceneEmpty>("level-4b");
+            registerScene<SceneEmpty>("level-5b");
+            
+            registerScene<SceneEmpty>("level-1c");
+            registerScene<SceneEmpty>("level-2c");
+            registerScene<SceneEmpty>("level-3c");
+            registerScene<SceneEmpty>("level-4c");
+            registerScene<SceneEmpty>("level-5c");
+            registerScene<SceneEmpty>("level-6c");
 
    
         }
@@ -59,10 +80,10 @@ class SceneManager{
                     current_scene = scene_dict.at(state)();
                 }catch (std::out_of_range& e){
                     throw std::out_of_range("\033[31mThe scene '" + state + "' its not defined\033[0m");
-                    exit(1);
+                   
                 }
 
-                current_scene->onInit();
+                current_scene->onInit(init_dict.find(state) != init_dict.end() ? init_dict[state] : std::unordered_map<std::string,std::string>{});
             }
             
             if (current_scene)
@@ -80,16 +101,15 @@ class SceneManager{
                 current_scene->onRender();
         }
 
-        void reloadScene(std::string scene){
-            if (scene_dict.find(scene) == scene_dict.end()){
-                manager_state = scene;
-                current_scene->onDestroy();
-                delete current_scene;
-                current_scene = scene_dict.at(scene)();
-                current_scene->onInit();
-            }
-        }
+    
+    private:
 
+        template<typename T>
+        void registerScene(const std::string& name){
+            scene_dict[name] = [this](){
+                return new T(this->game);
+            };
+        }
 
 };
 

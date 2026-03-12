@@ -13,7 +13,7 @@ class SceneComponent{
 
         virtual ~SceneComponent() = default;
 
-        virtual void onInit(){}
+        virtual void onInit(const std::unordered_map<std::string,std::string>& data = {}){}
 
         virtual void onUpdate(){}
 
@@ -29,7 +29,7 @@ class SceneEmpty : public SceneComponent{
     public:
         SceneEmpty(Game* game) : SceneComponent(game) {}
         ~SceneEmpty() override = default;
-        void onInit() override {std::cout << "SCENE CREATED" << std::endl;}
+        void onInit(const std::unordered_map<std::string,std::string>& data = {}) override {std::cout << "SCENE CREATED" << std::endl;}
         void onUpdate() override {}
         void onEvent(SDL_Event e) override {
             if (e.type == SDL_EVENT_KEY_DOWN){
@@ -39,8 +39,4 @@ class SceneEmpty : public SceneComponent{
         }
         void onRender() override {glClearColor(0.0f, 0.0f, 1.0f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);}
         void onDestroy() override {std::cout << "EMPTY DESTROYED" << std::endl;}
-        friend std::ostream& operator<<(std::ostream& os, const SceneEmpty& scene){
-            os << "Scene Empty class";
-            return os;
-        }
 };

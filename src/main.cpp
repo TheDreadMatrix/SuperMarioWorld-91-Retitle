@@ -104,8 +104,6 @@ void Game::closeGame(){
 
 void Game::switchScene(std::string scene_name, bool reload){
     scene = scene_name;
-    if (reload)
-        scenes->reloadScene(scene_name);
 }
 
 

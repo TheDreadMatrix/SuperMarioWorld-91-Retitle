@@ -144,3 +144,55 @@ ESC - выход из игры данные сохраняются
 Fn+F1 - пауза/старт
 
 WASD & QEZXC SPACE - Игровые
+
+
+
+u0 = x / aw
+v0 = y / ah
+
+u1 = x+w / aw
+v1 = y+h / ah
+
+
+u0 = 128 / 1024 = 0.125
+v0 = 256 / 1024 = 0.25
+
+u1 = 192 / 1024 = 0.1875
+v1 = 320 / 1024 = 0.3125
+
+
+
+
+
+
+
+
+
+
+21 march
+
+Animation duration c++
+text and dynamic text
+
+main-menu, intro, settings
+
+
+std::vector<float>  vertices = {
+                // positions       // uv_coords
+                0.0f, 1.0f,       0.0f, 1.0f,
+                1.0f, 1.0f,       1.0f, 1.0f,
+                1.0f, 0.0f,       1.0f, 0.0f,
+                0.0f, 0.0f,       0.0f, 0.0f
+
+            };
+
+            std::vector<unsigned int> indices = {
+                0, 1, 2, 2, 3, 0
+            };
+
+
+
+
+1) TILE-MAP
+
+
