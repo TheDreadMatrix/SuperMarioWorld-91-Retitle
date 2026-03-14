@@ -24,6 +24,8 @@ class Game{
         Program *shader=nullptr;
 
         glm::mat4 projection;
+        std::vector<float> vertices;
+        std::vector<unsigned int> indices;
 
         //SDL
         SDL_Window* window;

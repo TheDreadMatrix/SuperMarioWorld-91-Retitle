@@ -1,7 +1,7 @@
 #pragma once
 
 #include <myheaders/stdport/stdport.hpp>
-#include <SDL3/SDL.h>
+
 #include <myheaders/game.hpp>
 
 

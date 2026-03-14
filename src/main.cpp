@@ -1,9 +1,6 @@
 //OWN HEADERS
 #define STB_IMAGE_IMPLEMENTATION
-#define STB_TRUETYPE_IMPLEMENTATION
 
-
-#include <glm/gtc/matrix_transform.hpp>
 #include <myheaders/scene_manager.hpp>
 #include <myheaders/game.hpp>
 
@@ -28,7 +25,7 @@ Game::Game(){
     unsigned char* data = stbi_load("assets/icon.png", &width, &height, &channels, 4);
     SDL_Surface* icon = SDL_CreateSurfaceFrom(width, height, SDL_PIXELFORMAT_RGBA32, data, width * 4);
     SDL_SetWindowIcon(window, icon);
-    SDL_DestroySurface(icon);
+    SDL_DestroySurface(icon);  
     stbi_image_free(data);
 
     gl_context = SDL_GL_CreateContext(window);
@@ -51,6 +48,16 @@ Game::Game(){
     SDL_GetWindowSize(window, &window_width, &window_height);
     projection = glm::ortho(0.0f, static_cast<float>(window_width), static_cast<float>(window_height), 0.0f, 1.0f, -1.0f);
     glViewport(0, 0, window_width, window_height);
+
+    vertices = {
+        0.0f, 1.0f,       0.0f, 1.0f,
+        1.0f, 1.0f,       1.0f, 1.0f,
+        1.0f, 0.0f,       1.0f, 0.0f,
+        0.0f, 0.0f,       0.0f, 0.0f
+    };
+    indices = {
+        0, 1, 2, 2, 3, 0
+    };
 
 
     //FBO RBO TEXTURE

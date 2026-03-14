@@ -1,8 +1,7 @@
 #pragma once
 
 #include <myheaders/stdport/stdport.hpp>
-#include <glad/glad.h>
-#include <stb_image.h>
+
 
 
 using list_str = const std::vector<std::string>&;

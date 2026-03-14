@@ -8,6 +8,7 @@ RUN GAME
 ./main.exe
 ./super91.exe
 
+./build.ps1
 
 #DEFINED HEADERS
 

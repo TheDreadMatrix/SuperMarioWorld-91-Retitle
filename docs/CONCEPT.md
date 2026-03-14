@@ -192,6 +192,14 @@ std::vector<float>  vertices = {
 
 
 
+Atlas -> spriteOffsets 
+
+AtlasFont
+type_font = 1 - DEFAULT 2-OVERWORLD 3-MESSAGEBOX 4-JAPANBOX 5-JAPANOVERWORLD 6-MARIOLUIGITIMEOUT
+
+
+
+
 
 1) TILE-MAP
 
